@@ -61,7 +61,7 @@ def closestBone(ob, ar, use_center):
 
     else:
         # use the object origin vs bone head method
-        closest = min( [ (math.dist(ob.location, loc2world(ar, bone.head)), bone) for bone in def_bones ])
+        closest = min( [ (math.dist(ob.location, loc2world(ar, bone.head)), bone) for bone in def_bones ], key = lambda x: x[0])
     
     #extract bone name
     bone_name = closest[1].name
