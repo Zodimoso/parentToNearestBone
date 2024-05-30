@@ -18,9 +18,9 @@
 
 bl_info = {
     "name": "Parent to nearest bone",
-    "author": "Pablo Gentile",
-    "version": (0, 8, 0),
-    "blender": (3, 0, 0),
+    "author": "Pablo Gentile","John Thomas"
+    "version": (0, 8.5, 0),
+    "blender": (4, 1, 0),
     "location": "View3D > Object > Parent > Parent to nearest Bone",
     "description": "Parents object to the nearest bone",
     "warning": "",
@@ -49,15 +49,19 @@ def closestBone(ob, ar, use_center):
         
     # to edit mode
     bpy.ops.object.mode_set(mode='EDIT')    
-    
+
+    def_bones= [bone for bone in ar.data.edit_bones if bone.use_deform is True]###only uses bones with deform on so we know they are selectable and the ones that should be acting on the meshes(should be pulled out of loop in future to save on recources)
+
     # finds the minimum value from a list of tuples that store the distance and the bone itself
     # and stores the resulting bone
     if use_center:
         # use the geometric center vs bone.center method
-        closest = min( [ (math.dist(getGeometryCenter(ob), loc2world(ar, bone.center)), bone) for bone in ar.data.edit_bones ])
+
+        closest =  min([(math.dist(getGeometryCenter(ob), loc2world(ar, bone.center)), bone) for bone in def_bones ], key = lambda x: x[0])#added the lambda because it kept trying to compare the bones
+
     else:
         # use the object origin vs bone head method
-        closest = min( [ (math.dist(ob.location, loc2world(ar, bone.head)), bone) for bone in ar.data.edit_bones ])
+        closest = min( [ (math.dist(ob.location, loc2world(ar, bone.head)), bone) for bone in def_bones ])
     
     #extract bone name
     bone_name = closest[1].name
@@ -157,7 +161,7 @@ def main(context, use_center):
         for ob in my_objects:
             print( '–' * 80)
             print (ob.name)
-            print( '.' * 80)        
+            print( '.' * 80)
             my_closest = closestBone(ob, ar, use_center)
             parent2BoneKT(ob,ar,my_closest)
 
